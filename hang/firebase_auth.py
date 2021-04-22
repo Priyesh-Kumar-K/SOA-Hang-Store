@@ -95,7 +95,7 @@ def admin_add_product(data):
 def generateOrderID():
     try:
         last_record = db.child("customer orders").order_by_key().limit_to_last(1).get().val()
-        print("Hello")
+        # print("Hello")
         last_id = "".join(last_record.keys())
         order_num  = int(last_id[10:])
         order_num += 1
@@ -106,7 +106,7 @@ def generateOrderID():
         return order_id
 
     except:
-        print("Hello exception")
+        # print("Hello exception")
         date = datetime.datetime.now()
         date_format = date.strftime("%Y%m%d") #yyyymmdd
         order_id = "OD"+ date_format + "1"
@@ -123,7 +123,11 @@ def cart_buy(cart_data):
             prd_order['product_desc'] = ordered_products[prd_id]
             prd_order.pop('products_ordered') 
             prd_order['odate'] = str(datetime.datetime.now())
+            prd_order['ostatus'] = "ordered"
             order_id = generateOrderID()
+            prd_order['oid'] = order_id
+            prd_order.pop('n_items')
+            prd_order.pop('totalCost')
             db.child("customer orders").child(order_id).set(prd_order) #Storing user ordered cart data to firebase realtime database
             
         return True

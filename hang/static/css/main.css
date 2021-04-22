@@ -524,9 +524,9 @@ ul li:nth-child(1) .icon-sts::after {
   margin-bottom: -7px;
 	height: 30px;
 }
-ul li:nth-child(2) .icon-sts::before {
+/* ul li:nth-child(2) .icon-sts::before {
   color: #6774d5;
-}
+} */
 
 ul li:last-child .icon-sts::after{
  content: none;

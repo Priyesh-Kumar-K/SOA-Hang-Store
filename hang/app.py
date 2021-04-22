@@ -34,7 +34,6 @@ def cart_checkout():
     if request.method == "POST":
         try:
             cart_data = request.get_json()
-            print(cart_data)
             checkout_res = cart_buy(cart_data)
             if checkout_res:
                 return jsonify({"result":"success"})
@@ -172,6 +171,18 @@ def get_all_products():
     except:
         return jsonify({"result":"error"})
 
+@app.route("/get-customer-orders", methods=["POST"])
+def get_customer_orders():
+    if request.method == "POST":
+        resp = request.get_json()
+        try:
+            data = db.child('customer orders').order_by_child('email').equal_to(resp['email']).get().val()
+            if data:
+                return jsonify({"result":data})
+            else:
+                return jsonify({"result": "no orders"})
+        except:
+            return jsonify({"result": "error"})
 
 if __name__ == "__main__":
     app.run( port="5500", debug=True)

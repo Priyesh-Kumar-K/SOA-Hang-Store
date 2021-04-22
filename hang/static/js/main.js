@@ -1501,7 +1501,94 @@ function removeCartItem(e, itemId) {
         }
     };
 
+    let orders;
+    let userState = JSON.parse(localStorage.getItem('userState'));
+    // Fetching Your orders data via API
+
+    if (userState){
+        $.ajax({
+            url: '/get-customer-orders',
+            contentType: 'application/json',
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify({ email: userState['user']['id']}),
+            success: function (response) {
+                let resp = JSON.parse(JSON.stringify(response));
+                if (resp.result == "no orders" ) {
+
+                    $('.order-head').html("You Have No Orders!");
+                }
+                else if (resp.result == "error") {
+                    $('.order-head').html("Oops! Something went wrong, please try again later");
+                }
+                else {
+
+                   orders = resp.result;
+                   renderOrders(orders);
+
+                }
+
+            },
+            error: function (xhr) {
+                //Do Something to handle error
+                $('.order-head').html("Oops! Something went wrong, please try again later");
+            }
+        });
+
+    }
 
 
+    function renderOrders(orders){
+        $("#orders-table").html('');
+        let orders_content = $("#orders-table").html(); 
+    
+        Object.values(orders).map(item => {
+            let index = String(item.product_desc.id).length - String(item.product_desc.size).length - 1;
+            let img_id = String(item.product_desc.id).slice(0, index);
+
+        orders_content += `
+        <table  class="table-shopping-orders mb-3">
+								<tr class="table_row">
+									<td class="column-1">
+										<div class="how-itemcart1 product">
+											<img src="../static/images/${img_id}.jpg" alt="IMG">
+										</div>
+									</td>
+									<td class="column-2"> <div class="prd-prop">order id : ${item.oid} </div> <div class="prd-name">${item.product_desc.name}</div>  <div class="prd-prop">size: ${item.product_desc.size} | colour: white </div></td>
+									<td class="column-3">&#8377; ${item.product_desc.price}</td>
+									 
+									<td class="column-4">
+										<span>${item.product_desc.qty}</span>
+									</td>
+	
+									<td class="column-5" name='' id='col5' > 
+										<div name='product-sum' class='prd-sum'> &#8377; ${item.product_desc.price * item.product_desc.qty}</div>  
+				
+									</td>
+									<td class="column-6">  <div class="prd-prop">${item.address_1} ${item.address_2} ${item.city}-${item.post_code}</div> <div class="prd-prop">Name : ${item.name}</div> <div class="prd-prop">ph.no : ${item.mobile_num} </div></td>
+									<td class="column-7" id="order-status">
+										<ul>
+											
+										<li><div><i class="icon-sts zmdi zmdi-check-circle completed"></i> Ordered &nbsp; </div> </li>
+										<!-- <div class="icon-sts"></div> -->
+										<li><div><i class="icon-sts zmdi zmdi-check-circle"></i> Shipped &nbsp; </div></li>
+										<!-- <div class="icon-sts"></div> -->
+										<li><div><i class="icon-sts zmdi zmdi-check-circle"></i> Delivered</div> <!--<div style="padding-left: 10%; padding-top: 2%;">(12.01.2021)</div>--></li>
+										</ul>
+									</td>
+									
+									
+								</tr>
+							
+								
+								
+							</table>
+        `;
+        
+        });
+    
+        $("#orders-table").html(orders_content);
+    
+    }
 
 })(jQuery);
